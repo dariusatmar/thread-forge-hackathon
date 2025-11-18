@@ -1,26 +1,31 @@
 Requirements for fake data:
-1. Limit the states and cities to TX, FL, CA, CT, IN
-CA Cities: PERRIS, LONG BEACH,MENIFEE,ONTARIO,TEMECULA,MURRIETA,CHINO,APPLE VALLEY,MORGAN HILL,LAKE ELSINORE
+1. Limit the states and cities to TX and CT only
 
-TX Cities:
-PLANO,LEAGUE CITY,COLLEGE STATION,GARLAND,ROSHARON,ARGYLE,WYLIE,DICKINSON,LEWISVILLE,KELLER
+CT City: Bridgeport
+TX City: Dallas
 
-FL Cities:
-BRADENTON,RIVERVIEW,DAVENPORT,TAMPA,LITHIA,BARTOW,SARASOTA,LAND O LAKES,VALRICO,WESLEY CHAPEL
+Customer Distribution by ZIP Code:
 
-CT cities:
-NORWICH,BRISTOL,NEW HAVEN,W HAVEN,E HARTFORD,WATERBURY,MERIDEN,DANBURY
+Bridgeport, CT:
+- 06673: 65 customers
+- 06604: 61 customers
+- 06611: 51 customers
+- 06606: 50 customers
+Total Bridgeport: 227 customers
 
-IN cities:
-FORT WAYNE,LOGANSPORT,LAFAYETTE,ANGOLA,HOBART,DELPHI
+Dallas, TX:
+- 75201: 56 customers
+- 75234: 55 customers
+- 75219: 54 customers
+- 75232: 54 customers
+- 75209: 53 customers
+- 75228: 52 customers
+- 75230: 51 customers
+- 75217: 50 customers
+- 75252: 50 customers
+Total Dallas: 475 customers
 
-
-Each city should have 6-10 valid zipcodes
-
-
-2. Distribution of customers across cities and zipcodes
-Randomly Distribute customers among the zipcodes and cities with atleast 50 in each zipcode
-This will help us showcase the outages realistically across the map.
+Total Customers: 702 customers across 13 ZIP codes
 
 
 4. Call Data (Most Essential)
@@ -34,104 +39,60 @@ the volume will drop later on. So we need to fill the fake data in the datetime 
 
 Outage examples:
 
-Outage Events (Total: 10 events, ~2000 customers affected)
+Outage Events (Total: 5 events, ~350 customers affected)
+
 Outage Event 1
-CA, PERRIS, (7 zipcodes)
+TX, Dallas, (4 zipcodes)
  
-Zipcodes: 92570, 92571, 92572, 92573, 92574, 92599, 92596
-Total Customers Affected: 245
+Zipcodes: 75201, 75234, 75219, 75232
+Total Customers Affected: 219 customers (56+55+54+54)
 Outage Start: 11/16/2025 10:15 AM
 Outage End: 11/16/2025 11:32 AM
 Duration: 77 minutes
  
 Outage Event 2
-TX, PLANO, (4 zipcodes)
+CT, Bridgeport, (2 zipcodes)
  
-Zipcodes: 75023, 75024, 75025, 75074
-Total Customers Affected: 180
+Zipcodes: 06673, 06604
+Total Customers Affected: 126 customers (65+61)
 Outage Start: 11/18/2025 1:11 PM
 Outage End: 11/18/2025 2:21 PM
 Duration: 70 minutes
  
 Outage Event 3
-CA, LONG BEACH, (6 zipcodes)
+TX, Dallas, (3 zipcodes)
  
-Zipcodes: 90801, 90802, 90803, 90804, 90805, 90806
-Total Customers Affected: 220
-Outage Start: 11/18/2025 10:32 AM
-Outage End: 11/18/2025 12:01 PM
+Zipcodes: 75209, 75228, 75230
+Total Customers Affected: 156 customers (53+52+51)
+Outage Start: 11/19/2025 10:32 AM
+Outage End: 11/19/2025 12:01 PM
 Duration: 89 minutes
  
 Outage Event 4
-FL, TAMPA, (8 zipcodes)
+CT, Bridgeport, (2 zipcodes)
  
-Zipcodes: 33602, 33603, 33604, 33605, 33606, 33607, 33610, 33612
-Total Customers Affected: 290
-Outage Start: 11/19/2025 8:45 AM
-Outage End: 11/19/2025 9:47 AM
-Duration: 62 minutes
- 
-Outage Event 5
-CT, NEW HAVEN, (7 zipcodes)
- 
-Zipcodes: 06510, 06511, 06512, 06513, 06515, 06519, 06520
-Total Customers Affected: 165
+Zipcodes: 06611, 06606
+Total Customers Affected: 101 customers (51+50)
 Outage Start: 11/20/2025 2:20 PM
 Outage End: 11/20/2025 3:25 PM
 Duration: 65 minutes
  
-Outage Event 6
-IN, FORT WAYNE, (6 zipcodes)
+Outage Event 5
+TX, Dallas, (2 zipcodes)
  
-Zipcodes: 46802, 46803, 46804, 46805, 46806, 46808
-Total Customers Affected: 195
+Zipcodes: 75217, 75252
+Total Customers Affected: 100 customers (50+50)
 Outage Start: 11/21/2025 11:05 AM
 Outage End: 11/21/2025 12:20 PM
 Duration: 75 minutes
  
-Outage Event 7
-CA, TEMECULA, (6 zipcodes)
- 
-Zipcodes: 92590, 92591, 92592, 92593, 92596, 92597
-Total Customers Affected: 210
-Outage Start: 11/22/2025 3:30 PM
-Outage End: 11/22/2025 4:45 PM
-Duration: 75 minutes
- 
-Outage Event 8
-TX, LEAGUE CITY, (7 zipcodes)
- 
-Zipcodes: 77573, 77574, 77539, 77546, 77565, 77568, 77598
-Total Customers Affected: 175
-Outage Start: 11/23/2025 9:15 AM
-Outage End: 11/23/2025 9:45 AM
-Duration: 30 minutes
- 
-Outage Event 9
-FL, BRADENTON, (8 zipcodes)
- 
-Zipcodes: 34201, 34202, 34203, 34205, 34207, 34208, 34209, 34210
-Total Customers Affected: 185
-Outage Start: 11/24/2025 7:00 AM
-Outage End: 11/24/2025 8:25 AM
-Duration: 85 minutes
- 
-Outage Event 10
-IN, LAFAYETTE, (6 zipcodes)
- 
-Zipcodes: 47901, 47902, 47903, 47904, 47905, 47909
-Total Customers Affected: 155
-Outage Start: 11/25/2025 4:10 PM
-Outage End: 11/25/2025 5:30 PM
-Duration: 80 minutes
- 
  
 Total Summary
  
-Total Outage Events: 10
-Total Customers Affected: 2,020
-Duration Range: 30-89 minutes
-Date Range: 11/16/2025 - 11/25/2025
+Total Outage Events: 5
+Total Customers Affected: 702 (all customers will experience at least one outage)
+Duration Range: 65-89 minutes
+Date Range: 11/16/2025 - 11/21/2025
  
  
 Call Volume Distribution Guidelines
@@ -144,10 +105,18 @@ First 15 minutes: 40% of total calls (high surge)
 45-60 minutes: 7% of total calls (tapering off)
 60+ minutes: 3% of total calls (residual)
  
-Example for Outage Event 1 (245 customers):
+Example for Outage Event 1 (219 customers in Dallas):
  
-10:15-10 AM: ~98 calls (40%)
-10:30-10 AM: ~74 calls (30%)
-10:45-11 AM: ~49 calls (20%)
-11:00-11 AM: ~17 calls (7%)
-11:15-11 AM: ~7 calls (3%)
+10:15-10:30 AM: ~88 calls (40%)
+10:30-10:45 AM: ~66 calls (30%)
+10:45-11:00 AM: ~44 calls (20%)
+11:00-11:15 AM: ~15 calls (7%)
+11:15-11:32 AM: ~6 calls (3%)
+
+Example for Outage Event 2 (126 customers in Bridgeport):
+
+1:11-1:26 PM: ~50 calls (40%)
+1:26-1:41 PM: ~38 calls (30%)
+1:41-1:56 PM: ~25 calls (20%)
+1:56-2:11 PM: ~9 calls (7%)
+2:11-2:21 PM: ~4 calls (3%)
