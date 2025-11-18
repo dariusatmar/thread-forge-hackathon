@@ -28,11 +28,11 @@ export function TimeRangeSelector({ selectedHours, onSelect }: TimeRangeSelector
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className={`
-              px-4 py-2 rounded-lg font-medium transition-all
+              px-4 py-2 rounded font-medium transition-colors border-2 border-black
               ${
                 isSelected
-                  ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                  : 'bg-white/80 dark:bg-gray-800/80 text-gray-700 dark:text-gray-300 hover:bg-white dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-600'
+                  ? 'bg-black text-white'
+                  : 'bg-white text-black hover:bg-gray-100'
               }
             `}
           >

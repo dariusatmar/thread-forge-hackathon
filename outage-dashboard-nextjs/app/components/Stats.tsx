@@ -16,21 +16,18 @@ export function Stats({ data, isLoading }: StatsProps) {
       label: 'Total Calls',
       value: data?.total_calls || 0,
       icon: Phone,
-      color: 'from-blue-500 to-cyan-500',
       formatter: formatNumber,
     },
     {
       label: 'Unique Customers',
       value: data?.unique_customers || 0,
       icon: Users,
-      color: 'from-purple-500 to-pink-500',
       formatter: formatNumber,
     },
     {
       label: 'Avg Duration',
       value: data?.avg_duration_minutes || 0,
       icon: Clock,
-      color: 'from-orange-500 to-red-500',
       formatter: formatDuration,
     },
     {
@@ -42,8 +39,7 @@ export function Stats({ data, isLoading }: StatsProps) {
           })
         : 'N/A',
       icon: Calendar,
-      color: 'from-green-500 to-emerald-500',
-      formatter: (val: any) => val,
+      formatter: (val: string | number) => val,
     },
   ];
 
@@ -57,22 +53,21 @@ export function Stats({ data, isLoading }: StatsProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="relative overflow-hidden rounded-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-lg border border-gray-200 dark:border-gray-700"
+            className="rounded bg-white border-2 border-black"
           >
-            <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-5`}></div>
-            <div className="relative p-6">
+            <div className="p-6">
               <div className="flex items-center justify-between mb-2">
-                <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
+                <p className="text-sm font-medium text-gray-600">
                   {stat.label}
                 </p>
-                <div className={`p-2 rounded-lg bg-gradient-to-br ${stat.color}`}>
-                  <Icon className="w-4 h-4 text-white" />
+                <div className="p-2 rounded bg-gray-100 border border-black">
+                  <Icon className="w-4 h-4 text-black" />
                 </div>
               </div>
               {isLoading ? (
-                <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+                <div className="h-8 bg-gray-100 rounded animate-pulse"></div>
               ) : (
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className="text-3xl font-bold text-black">
                   {stat.formatter(stat.value)}
                 </p>
               )}

@@ -109,10 +109,10 @@ export function Timeline({ data, isLoading }: TimelineProps) {
 
   if (isLoading) {
     return (
-      <div className="w-full h-80 bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+      <div className="w-full h-80 bg-white rounded p-6 border-2 border-black">
         <div className="animate-pulse space-y-4">
-          <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded w-1/3"></div>
-          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded"></div>
+          <div className="h-6 bg-gray-100 rounded w-1/3"></div>
+          <div className="h-64 bg-gray-100 rounded"></div>
         </div>
       </div>
     );
@@ -123,9 +123,9 @@ export function Timeline({ data, isLoading }: TimelineProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.2 }}
-      className="w-full bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700 backdrop-blur-sm"
+      className="w-full bg-white rounded p-6 border-2 border-black"
     >
-      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+      <h3 className="text-xl font-bold text-black mb-4">
         Call Timeline
       </h3>
       <div className="h-80">

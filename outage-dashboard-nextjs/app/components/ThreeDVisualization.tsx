@@ -145,16 +145,16 @@ export function ThreeDVisualization({ data, isLoading }: ThreeDVisualizationProp
 
   if (!mounted) {
     return (
-      <div className="w-full h-[600px] bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-        <div className="animate-pulse h-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+      <div className="w-full h-[600px] bg-white rounded p-6 border-2 border-black">
+        <div className="animate-pulse h-full bg-gray-100 rounded"></div>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="w-full h-[600px] bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-        <div className="animate-pulse h-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+      <div className="w-full h-[600px] bg-white rounded p-6 border-2 border-black">
+        <div className="animate-pulse h-full bg-gray-100 rounded"></div>
       </div>
     );
   }
@@ -164,9 +164,9 @@ export function ThreeDVisualization({ data, isLoading }: ThreeDVisualizationProp
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.4 }}
-      className="w-full h-[600px] bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl overflow-hidden shadow-lg border border-gray-700"
+      className="w-full h-[600px] bg-black rounded overflow-hidden border-2 border-black"
     >
-      <div className="p-4 border-b border-gray-700 bg-black/20">
+      <div className="p-4 border-b-2 border-white">
         <h3 className="text-xl font-bold text-white">3D Call Volume Visualization</h3>
         <p className="text-sm text-gray-300 mt-1">
           Top 10 ZIP codes by call volume (hover for details)

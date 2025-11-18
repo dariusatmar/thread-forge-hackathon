@@ -3,18 +3,16 @@
 import { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
 import { motion } from 'framer-motion';
-import type { OutageDataResponse, HeatmapPoint } from '@/types';
+import type { OutageDataResponse } from '@/types';
 import { getHeatmapColor } from '@/lib/utils';
 import 'leaflet/dist/leaflet.css';
 
 // Fix Leaflet default icon issue
 import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 let DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
   iconSize: [25, 41],
   iconAnchor: [12, 41],
 });
@@ -24,6 +22,15 @@ L.Marker.prototype.options.icon = DefaultIcon;
 interface OutageMapProps {
   data: OutageDataResponse | undefined;
   isLoading: boolean;
+  onSelectOutage?: (outage: {
+    zip_code: string;
+    call_count: number;
+    coordinates: {
+      city: string;
+      lat: number;
+      lon: number;
+    };
+  }) => void;
 }
 
 function MapUpdater({ data }: { data: OutageDataResponse | undefined }) {
@@ -41,7 +48,7 @@ function MapUpdater({ data }: { data: OutageDataResponse | undefined }) {
   return null;
 }
 
-export function OutageMap({ data, isLoading }: OutageMapProps) {
+export function OutageMap({ data, isLoading, onSelectOutage }: OutageMapProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -50,16 +57,16 @@ export function OutageMap({ data, isLoading }: OutageMapProps) {
 
   if (!mounted) {
     return (
-      <div className="w-full h-[600px] bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-        <div className="animate-pulse h-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+      <div className="w-full h-[600px] bg-white rounded p-6 border-2 border-black">
+        <div className="animate-pulse h-full bg-gray-100 rounded"></div>
       </div>
     );
   }
 
   if (isLoading) {
     return (
-      <div className="w-full h-[600px] bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-        <div className="animate-pulse h-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+      <div className="w-full h-[600px] bg-white rounded p-6 border-2 border-black">
+        <div className="animate-pulse h-full bg-gray-100 rounded"></div>
       </div>
     );
   }
@@ -76,13 +83,13 @@ export function OutageMap({ data, isLoading }: OutageMapProps) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.3 }}
-      className="w-full h-[600px] bg-white/90 dark:bg-gray-800/90 rounded-xl overflow-hidden shadow-lg border border-gray-200 dark:border-gray-700 backdrop-blur-sm"
+      className="relative z-0 w-full h-[600px] bg-white rounded overflow-hidden border-2 border-black"
     >
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+      <div className="p-4 border-b-2 border-black">
+        <h3 className="text-xl font-bold text-black">
           Outage Heat Map
         </h3>
-        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <p className="text-sm text-gray-600 mt-1">
           {data?.data.length || 0} ZIP codes with technical support calls
         </p>
       </div>
@@ -134,6 +141,14 @@ export function OutageMap({ data, isLoading }: OutageMapProps) {
                         {point.customer_ids.length}
                       </p>
                     </div>
+                    {onSelectOutage && (
+                      <button
+                        onClick={() => onSelectOutage(point)}
+                        className="mt-3 w-full px-3 py-2 bg-black text-white text-sm font-semibold rounded hover:bg-gray-800 transition-colors"
+                      >
+                        Explore outage
+                      </button>
+                    )}
                   </div>
                 </Popup>
               </CircleMarker>
@@ -145,23 +160,23 @@ export function OutageMap({ data, isLoading }: OutageMapProps) {
       </div>
 
       {/* Legend */}
-      <div className="absolute bottom-8 right-8 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-lg shadow-lg p-3 border border-gray-200 dark:border-gray-700">
-        <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+      <div className="absolute bottom-8 right-8 bg-white rounded p-3 border-2 border-black">
+        <p className="text-xs font-semibold text-black mb-2">
           Call Volume
         </p>
         <div className="flex items-center gap-2">
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#00ff00' }}></div>
-              <span className="text-xs text-gray-600 dark:text-gray-400">Low</span>
+              <div className="w-4 h-4 rounded-full border border-black" style={{ backgroundColor: '#00ff00' }}></div>
+              <span className="text-xs text-gray-600">Low</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#ffff00' }}></div>
-              <span className="text-xs text-gray-600 dark:text-gray-400">Medium</span>
+              <div className="w-4 h-4 rounded-full border border-black" style={{ backgroundColor: '#ffff00' }}></div>
+              <span className="text-xs text-gray-600">Medium</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#ff0000' }}></div>
-              <span className="text-xs text-gray-600 dark:text-gray-400">High</span>
+              <div className="w-4 h-4 rounded-full border border-black" style={{ backgroundColor: '#ff0000' }}></div>
+              <span className="text-xs text-gray-600">High</span>
             </div>
           </div>
         </div>

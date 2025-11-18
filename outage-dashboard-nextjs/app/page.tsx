@@ -6,6 +6,7 @@ import dynamic from 'next/dynamic';
 import { Stats } from './components/Stats';
 import { Timeline } from './components/Timeline';
 import { TimeRangeSelector } from './components/TimeRangeSelector';
+import { OutageDetailsPane } from './components/OutageDetailsPane';
 import { useOutageData, useTimelineData, useStats } from '@/lib/hooks';
 import { RefreshCw, Map, BarChart3 } from 'lucide-react';
 
@@ -13,8 +14,8 @@ import { RefreshCw, Map, BarChart3 } from 'lucide-react';
 const OutageMap = dynamic(() => import('./components/OutageMap').then((mod) => ({ default: mod.OutageMap })), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[600px] bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-      <div className="animate-pulse h-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+    <div className="w-full h-[600px] bg-white rounded p-6 border-2 border-black">
+      <div className="animate-pulse h-full bg-gray-100 rounded"></div>
     </div>
   ),
 });
@@ -24,8 +25,8 @@ const ThreeDVisualization = dynamic(
   {
     ssr: false,
     loading: () => (
-      <div className="w-full h-[600px] bg-white/90 dark:bg-gray-800/90 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
-        <div className="animate-pulse h-full bg-gray-200 dark:bg-gray-700 rounded"></div>
+      <div className="w-full h-[600px] bg-white rounded p-6 border-2 border-black">
+        <div className="animate-pulse h-full bg-gray-100 rounded"></div>
       </div>
     ),
   }
@@ -35,6 +36,15 @@ export default function DashboardPage() {
   const [selectedHours, setSelectedHours] = useState(24);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [view, setView] = useState<'2d' | '3d'>('2d');
+  const [selectedOutage, setSelectedOutage] = useState<{
+    zip_code: string;
+    call_count: number;
+    coordinates: {
+      city: string;
+      lat: number;
+      lon: number;
+    };
+  } | null>(null);
 
   const {
     data: outageData,
@@ -55,20 +65,20 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700 sticky top-0 z-50 shadow-sm"
+        className="bg-white border-b border-black sticky top-0 z-50"
       >
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl lg:text-4xl font-bold text-black">
                 Outage Dashboard
               </h1>
-              <p className="text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-gray-600 mt-1">
                 Real-time Technical Support Analytics
               </p>
             </div>
@@ -78,7 +88,7 @@ export default function DashboardPage() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleRefresh}
-                className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg shadow-lg hover:shadow-xl transition-all"
+                className="flex items-center gap-2 px-4 py-2 bg-white text-black border-2 border-black rounded hover:bg-gray-100 transition-colors"
               >
                 <RefreshCw className="w-4 h-4" />
                 Refresh
@@ -89,10 +99,10 @@ export default function DashboardPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setView('2d')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2 border-2 border-black rounded transition-colors ${
                     view === '2d'
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                      ? 'bg-black text-white'
+                      : 'bg-white text-black hover:bg-gray-100'
                   }`}
                 >
                   <Map className="w-4 h-4" />
@@ -102,10 +112,10 @@ export default function DashboardPage() {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setView('3d')}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2 border-2 border-black rounded transition-colors ${
                     view === '3d'
-                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                      : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700'
+                      ? 'bg-black text-white'
+                      : 'bg-white text-black hover:bg-gray-100'
                   }`}
                 >
                   <BarChart3 className="w-4 h-4" />
@@ -118,9 +128,9 @@ export default function DashboardPage() {
                   type="checkbox"
                   checked={autoRefresh}
                   onChange={(e) => setAutoRefresh(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="w-4 h-4 rounded border-black text-black focus:ring-black"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Auto-refresh</span>
+                <span className="text-sm text-black">Auto-refresh</span>
               </label>
             </div>
           </div>
@@ -139,7 +149,11 @@ export default function DashboardPage() {
 
           {/* Map or 3D Visualization */}
           {view === '2d' ? (
-            <OutageMap data={outageData} isLoading={outageLoading} />
+            <OutageMap 
+              data={outageData} 
+              isLoading={outageLoading}
+              onSelectOutage={setSelectedOutage}
+            />
           ) : (
             <ThreeDVisualization data={outageData} isLoading={outageLoading} />
           )}
@@ -150,8 +164,8 @@ export default function DashboardPage() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 py-6 border-t border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
-        <div className="container mx-auto px-4 text-center text-sm text-gray-600 dark:text-gray-400">
+      <footer className="mt-16 py-6 border-t border-black bg-white">
+        <div className="container mx-auto px-4 text-center text-sm text-gray-600">
           <p>
             Built with Next.js 14, React, TypeScript, Leaflet, Three.js, and Tailwind CSS
           </p>
@@ -160,6 +174,15 @@ export default function DashboardPage() {
           </p>
         </div>
       </footer>
+
+      {/* Outage Details Pane */}
+      {selectedOutage && (
+        <OutageDetailsPane
+          selectedOutage={selectedOutage}
+          selectedHours={selectedHours}
+          onClose={() => setSelectedOutage(null)}
+        />
+      )}
     </div>
   );
 }
