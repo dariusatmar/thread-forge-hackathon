@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Successfully converted Flask-based Python web application to a modern **Next.js 14** application with React, TypeScript, Leaflet, Three.js, and Tailwind CSS.
+Successfully converted Flask-based Python web application to a modern **Next.js 14** application with React, TypeScript, Leaflet, and Tailwind CSS.
 
 **Status**: ✅ **Complete and Production Ready**
 
@@ -31,8 +31,6 @@ Successfully converted Flask-based Python web application to a modern **Next.js 
 - ✅ **React 18** - Modern React with hooks
 - ✅ **TypeScript** - Full type safety throughout
 - ✅ **Leaflet** - 2D interactive mapping
-- ✅ **Three.js + React Three Fiber** - 3D visualizations
-- ✅ **Drei** - Three.js helper components
 - ✅ **Tailwind CSS** - Utility-first styling
 - ✅ **Framer Motion** - Smooth animations
 
@@ -56,7 +54,6 @@ outage-dashboard-nextjs/
 │   │   └── stats/route.ts              # Summary statistics
 │   ├── components/                      # React Components
 │   │   ├── OutageMap.tsx               # Leaflet 2D map
-│   │   ├── ThreeDVisualization.tsx     # Three.js 3D view
 │   │   ├── Timeline.tsx                # Chart.js timeline
 │   │   ├── Stats.tsx                   # Statistics cards
 │   │   └── TimeRangeSelector.tsx       # Time controls
@@ -135,11 +132,9 @@ npx prisma db push   # Sync schema to database
 ### Core Functionality
 - ✅ Real-time data visualization (auto-refresh every 30s)
 - ✅ Interactive 2D heat map with color gradients
-- ✅ 3D bar chart visualization (NEW!)
 - ✅ Timeline chart with hourly aggregation
 - ✅ Statistics dashboard (4 key metrics)
 - ✅ Time range selector (1h, 6h, 24h, week, month)
-- ✅ Toggle between 2D/3D views
 - ✅ Manual refresh button
 - ✅ Auto-refresh toggle
 
@@ -182,15 +177,6 @@ npx prisma db push   # Sync schema to database
 - Auto-fit to data bounds
 - Visual legend
 - OpenStreetMap tiles
-
-### 3D Visualization (Three.js)
-- 3D bar chart of top 10 ZIP codes
-- Orbit controls (rotate, zoom, pan)
-- Hover tooltips
-- Dynamic lighting & shadows
-- Animated bars
-- Color coding by volume
-- Professional scene setup
 
 ---
 
@@ -394,7 +380,6 @@ Before production deployment:
 - [x] All time ranges work
 - [x] Auto-refresh functions
 - [x] Manual refresh works
-- [x] Toggle 2D/3D works
 - [x] Responsive on mobile
 - [x] Dark mode renders
 - [x] No console errors
@@ -416,8 +401,6 @@ For team onboarding:
 - **Next.js**: https://nextjs.org/learn
 - **Tailwind CSS**: https://tailwindcss.com/docs
 - **Prisma**: https://www.prisma.io/docs
-- **Three.js**: https://threejs.org/docs/
-- **React Three Fiber**: https://docs.pmnd.rs/react-three-fiber
 
 ---
 

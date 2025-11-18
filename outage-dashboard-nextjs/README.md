@@ -1,6 +1,6 @@
 # Outage Dashboard - Next.js Edition
 
-A modern, real-time visualization dashboard for technical support calls featuring interactive 2D heat maps and stunning 3D visualizations. Built with Next.js 14, React, TypeScript, Leaflet, Three.js, and Tailwind CSS.
+A modern, real-time visualization dashboard for technical support calls featuring interactive 2D heat maps. Built with Next.js 14, React, TypeScript, Leaflet, and Tailwind CSS.
 
 ![Dashboard Preview](https://img.shields.io/badge/Status-Ready-brightgreen)
 ![Next.js](https://img.shields.io/badge/Next.js-14+-black)
@@ -12,11 +12,9 @@ A modern, real-time visualization dashboard for technical support calls featurin
 ### Core Functionality
 - **Real-time Data Visualization** - Auto-refreshing every 30 seconds
 - **Interactive 2D Heat Map** - Leaflet-based geographic visualization with color-coded intensity
-- **3D Call Volume Visualization** - Three.js/React Three Fiber powered 3D bar charts
 - **Timeline Analytics** - Hourly call patterns with Chart.js
 - **Live Statistics Dashboard** - Total calls, unique customers, average duration, and last call time
 - **Flexible Time Ranges** - View data for last hour, 6 hours, 24 hours, week, or month
-- **Toggle Between Views** - Switch seamlessly between 2D map and 3D visualization
 
 ### Technical Highlights
 - **Next.js 14** with App Router and Server Components
@@ -26,7 +24,6 @@ A modern, real-time visualization dashboard for technical support calls featurin
 - **TanStack Query** for efficient data fetching and caching
 - **Framer Motion** for smooth animations
 - **Leaflet** for 2D mapping
-- **React Three Fiber + Drei** for 3D visualizations
 - **Chart.js** for timeline charts
 
 ## 📋 Prerequisites
@@ -112,22 +109,14 @@ The dashboard will be available at [http://localhost:3000](http://localhost:3000
 
 1. **View Dashboard** - Open http://localhost:3000 in your browser
 2. **Change Time Range** - Click time range buttons (Last Hour, 6 Hours, 24 Hours, etc.)
-3. **Switch Views** - Toggle between "2D Map" and "3D View" buttons
-4. **Manual Refresh** - Click the "Refresh" button to update data immediately
-5. **Auto-Refresh** - Toggle the "Auto-refresh" checkbox to enable/disable automatic updates
+3. **Manual Refresh** - Click the "Refresh" button to update data immediately
+4. **Auto-Refresh** - Toggle the "Auto-refresh" checkbox to enable/disable automatic updates
 
 ### 2D Map View
 - **Zoom/Pan** - Use mouse wheel to zoom, drag to pan
 - **View Details** - Click on any circle marker to see ZIP code details
 - **Color Legend** - Green (low volume) → Yellow (medium) → Red (high volume)
 - **Circle Size** - Larger circles indicate more calls
-
-### 3D Visualization View
-- **Rotate** - Click and drag to rotate the view
-- **Zoom** - Scroll to zoom in/out
-- **Hover** - Hover over bars to see ZIP code and call count
-- **Bar Height** - Taller bars indicate more calls
-- **Bar Color** - Green (low) → Red (high) call volume
 
 ## 📁 Project Structure
 
@@ -140,7 +129,6 @@ outage-dashboard-nextjs/
 │   │   └── stats/                 # Statistics endpoint
 │   ├── components/                 # React components
 │   │   ├── OutageMap.tsx          # Leaflet 2D map
-│   │   ├── ThreeDVisualization.tsx # Three.js 3D view
 │   │   ├── Timeline.tsx           # Chart.js timeline
 │   │   ├── Stats.tsx              # Stats cards
 │   │   └── TimeRangeSelector.tsx  # Time range controls
@@ -385,11 +373,6 @@ npx prisma generate
 - Check browser console for errors
 - Verify Leaflet CSS is imported
 
-### 3D Visualization Issues
-- Update GPU drivers
-- Try a different browser (Chrome/Firefox recommended)
-- Check WebGL support: https://get.webgl.org/
-
 ## 🔒 Security Notes
 
 This is designed for **internal/development use**. For production:
@@ -414,7 +397,6 @@ This is designed for **internal/development use**. For production:
 - ✅ Hot module replacement
 - ✅ Optimized production builds
 - ✅ Better developer experience
-- ✅ 3D visualizations with Three.js
 - ✅ Smooth animations with Framer Motion
 
 ### Migration Path:
@@ -431,8 +413,6 @@ Both versions can run simultaneously:
 | **UI Library** | React 18 | Component-based UI |
 | **Styling** | Tailwind CSS | Utility-first CSS |
 | **2D Maps** | Leaflet + React Leaflet | Interactive mapping |
-| **3D Graphics** | Three.js + React Three Fiber | 3D visualizations |
-| **3D Helpers** | Drei | React Three Fiber utilities |
 | **Charts** | Chart.js + React Chartjs 2 | Data visualization |
 | **Animations** | Framer Motion | Smooth UI animations |
 | **Data Fetching** | TanStack Query | Server state management |
@@ -467,12 +447,11 @@ For issues or questions:
 - Original Flask implementation team
 - Next.js team for the amazing framework
 - Leaflet community for mapping tools
-- Three.js and React Three Fiber teams
 - All open-source contributors
 
 ---
 
-**Built with ❤️ using Next.js 14, React, TypeScript, Leaflet, Three.js, and Tailwind CSS**
+**Built with ❤️ using Next.js 14, React, TypeScript, Leaflet, and Tailwind CSS**
 
 **Version:** 2.0.0
 **Last Updated:** 2025-11-18

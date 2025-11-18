@@ -8,7 +8,7 @@ import { Timeline } from './components/Timeline';
 import { TimeRangeSelector } from './components/TimeRangeSelector';
 import { OutageDetailsPane } from './components/OutageDetailsPane';
 import { useOutageData, useTimelineData, useStats } from '@/lib/hooks';
-import { RefreshCw, Map, BarChart3 } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 // Dynamic imports for components that use client-side only libraries
 const OutageMap = dynamic(() => import('./components/OutageMap').then((mod) => ({ default: mod.OutageMap })), {
@@ -20,22 +20,9 @@ const OutageMap = dynamic(() => import('./components/OutageMap').then((mod) => (
   ),
 });
 
-const ThreeDVisualization = dynamic(
-  () => import('./components/ThreeDVisualization').then((mod) => ({ default: mod.ThreeDVisualization })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="w-full h-[600px] bg-white rounded p-6 border-2 border-black">
-        <div className="animate-pulse h-full bg-gray-100 rounded"></div>
-      </div>
-    ),
-  }
-);
-
 export default function DashboardPage() {
   const [selectedHours, setSelectedHours] = useState(24);
   const [autoRefresh, setAutoRefresh] = useState(true);
-  const [view, setView] = useState<'2d' | '3d'>('2d');
   const [selectedOutage, setSelectedOutage] = useState<{
     zip_code: string;
     call_count: number;
@@ -94,35 +81,6 @@ export default function DashboardPage() {
                 Refresh
               </motion.button>
 
-              <div className="flex gap-2">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setView('2d')}
-                  className={`flex items-center gap-2 px-4 py-2 border-2 border-black rounded transition-colors ${
-                    view === '2d'
-                      ? 'bg-black text-white'
-                      : 'bg-white text-black hover:bg-gray-100'
-                  }`}
-                >
-                  <Map className="w-4 h-4" />
-                  2D Map
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setView('3d')}
-                  className={`flex items-center gap-2 px-4 py-2 border-2 border-black rounded transition-colors ${
-                    view === '3d'
-                      ? 'bg-black text-white'
-                      : 'bg-white text-black hover:bg-gray-100'
-                  }`}
-                >
-                  <BarChart3 className="w-4 h-4" />
-                  3D View
-                </motion.button>
-              </div>
-
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -147,16 +105,12 @@ export default function DashboardPage() {
           {/* Stats Cards */}
           <Stats data={statsData} isLoading={statsLoading} />
 
-          {/* Map or 3D Visualization */}
-          {view === '2d' ? (
-            <OutageMap 
-              data={outageData} 
-              isLoading={outageLoading}
-              onSelectOutage={setSelectedOutage}
-            />
-          ) : (
-            <ThreeDVisualization data={outageData} isLoading={outageLoading} />
-          )}
+          {/* Map */}
+          <OutageMap 
+            data={outageData} 
+            isLoading={outageLoading}
+            onSelectOutage={setSelectedOutage}
+          />
 
           {/* Timeline Chart */}
           <Timeline data={timelineData} isLoading={timelineLoading} />
@@ -167,7 +121,7 @@ export default function DashboardPage() {
       <footer className="mt-16 py-6 border-t border-black bg-white">
         <div className="container mx-auto px-4 text-center text-sm text-gray-600">
           <p>
-            Built with Next.js 14, React, TypeScript, Leaflet, Three.js, and Tailwind CSS
+            Built with Next.js 14, React, TypeScript, Leaflet, and Tailwind CSS
           </p>
           <p className="mt-1">
             Last updated: {statsData?.last_call_time ? new Date(statsData.last_call_time).toLocaleString() : 'N/A'}

@@ -339,7 +339,6 @@ Complete feature list for the Next.js Outage Dashboard.
 
 **Dynamic Imports**:
 - OutageMap (client-only)
-- ThreeDVisualization (client-only)
 
 ---
 
