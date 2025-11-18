@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma, ZIP_COORDINATES } from '@/lib/db';
+import { prisma, getZipCoordinates } from '@/lib/db';
 import type { OutageDataResponse, OutageDataPoint } from '@/types';
 
 export async function GET(request: NextRequest) {
@@ -17,10 +17,13 @@ export async function GET(request: NextRequest) {
       timeFilter = new Date(Date.now() - hours * 60 * 60 * 1000);
     }
 
+    console.log(`Fetching outage data for time filter: ${timeFilter.toISOString()}`);
+
     // Query to get call data joined with customer location
+    // Extract ZIP code from service_address (last 5 digits)
     const query = `
       SELECT
-        c.location as zip_code,
+        SUBSTRING(c.service_address FROM '\\d{5}$') as zip_code,
         COUNT(DISTINCT cd.call_id) as call_count,
         AVG(EXTRACT(EPOCH FROM (cd.enddatetime - cd.startdatetime)) / 60) as avg_duration,
         ARRAY_AGG(DISTINCT cd.customer_id) as customer_ids
@@ -29,20 +32,26 @@ export async function GET(request: NextRequest) {
       JOIN public.customers c ON cd.customer_id = c.customer_id
       WHERE td.call_reason = 'technical_support'
         AND cd.startdatetime >= $1
-      GROUP BY c.location
-      HAVING c.location IS NOT NULL
+      GROUP BY 1
+      HAVING SUBSTRING(c.service_address FROM '\\d{5}$') IS NOT NULL
       ORDER BY call_count DESC
     `;
 
     const results = await prisma.$queryRawUnsafe<any[]>(query, timeFilter);
+    console.log(`Query returned ${results.length} ZIP codes with technical support calls`);
+
+    // Load ZIP coordinates from CSV
+    const ZIP_COORDINATES = getZipCoordinates();
 
     // Transform results with coordinates
+    const missingZipCodes: string[] = [];
     const data: OutageDataPoint[] = results
       .map((row) => {
         const zipCode = row.zip_code;
         const coordinates = ZIP_COORDINATES[zipCode];
 
         if (!coordinates) {
+          missingZipCodes.push(zipCode);
           return null;
         }
 
@@ -55,6 +64,12 @@ export async function GET(request: NextRequest) {
         };
       })
       .filter((item): item is OutageDataPoint => item !== null);
+
+    if (missingZipCodes.length > 0) {
+      console.warn(`Missing coordinates for ZIP codes: ${missingZipCodes.join(', ')}`);
+    }
+
+    console.log(`Returning ${data.length} outage data points after coordinate mapping`);
 
     const response: OutageDataResponse = {
       data,
