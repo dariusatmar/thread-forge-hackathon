@@ -53,3 +53,17 @@ model Customer {
   @@map("customers")
   @@schema("public")
 }
+
+model ConfirmedIncident {
+  incident_id         Int      @id @default(autoincrement()) @map("incident_id")
+  zip_code            String   @map("zip_code") @db.VarChar(10)
+  outage_start_time   DateTime @map("outage_start_time") @db.Timestamp(6)
+  outage_end_time     DateTime @map("outage_end_time") @db.Timestamp(6)
+  affected_customers  Int      @map("affected_customers")
+  incident_summary    String   @map("incident_summary") @db.Text
+  status              String   @default("Unresolved") @map("status") @db.VarChar(50)
+  created_at          DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  @@map("confirmedIncidents")
+  @@schema("team_thread_forge")
+}

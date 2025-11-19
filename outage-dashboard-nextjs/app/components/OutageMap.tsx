@@ -126,7 +126,7 @@ export function OutageMap({ data, isLoading, onSelectOutage }: OutageMapProps) {
                 <Popup>
                   <div className="p-2">
                     <h4 className="font-bold text-lg mb-2">
-                      {point.coordinates.city} ({point.zip_code})
+                      ZIP: {point.zip_code}
                     </h4>
                     <div className="space-y-1 text-sm">
                       <p>
