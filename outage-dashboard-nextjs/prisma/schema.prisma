@@ -67,3 +67,16 @@ model ConfirmedIncident {
   @@map("confirmedIncidents")
   @@schema("team_thread_forge")
 }
+
+model SocialMediaData {
+  id            Int      @id @default(autoincrement()) @map("id")
+  username      String   @map("Username") @db.VarChar(71)
+  social_media  String   @map("Social_Media") @db.VarChar(58)
+  comment       String   @map("Comment") @db.VarChar(177)
+  location      String   @map("Location") @db.VarChar(72)
+  timestamp     DateTime @map("Timestamp") @db.Timestamp(6)
+  category      String   @map("Category") @db.VarChar(76)
+
+  @@map("social_media_data")
+  @@schema("team_thread_forge")
+}

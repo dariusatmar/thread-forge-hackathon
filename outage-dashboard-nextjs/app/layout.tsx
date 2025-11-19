@@ -2,12 +2,13 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
+import { Navigation } from './components/Navigation';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Outage Dashboard - Technical Support Analytics',
-  description: 'Real-time visualization of technical support calls with interactive heat maps and 3D visualizations',
+  title: 'ThreadForge Dashboard - Technical Support & Social Media Analytics',
+  description: 'Real-time visualization of technical support calls and social media analytics with AI-powered insights',
 };
 
 export default function RootLayout({
@@ -18,7 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <Navigation />
+          {children}
+        </Providers>
       </body>
     </html>
   );

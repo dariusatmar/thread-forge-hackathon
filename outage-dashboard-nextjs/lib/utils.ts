@@ -36,3 +36,85 @@ export function getHeatmapColor(intensity: number): string {
   }
   return colors[0].color;
 }
+
+// Social Media utilities
+export function getSentimentColor(category: string): string {
+  const positiveCategories = ['Positive Feedback'];
+  const negativeCategories = [
+    'Service Issue',
+    'Billing Issue',
+    'Customer Service Complaint',
+    'Corporate/PR Issue',
+  ];
+
+  if (positiveCategories.includes(category)) {
+    return 'text-green-600 bg-green-50 border-green-200';
+  } else if (negativeCategories.includes(category)) {
+    return 'text-red-600 bg-red-50 border-red-200';
+  } else {
+    return 'text-blue-600 bg-blue-50 border-blue-200';
+  }
+}
+
+export function getCategoryIcon(category: string): string {
+  const iconMap: Record<string, string> = {
+    'Service Issue': '⚠️',
+    'Billing Issue': '💰',
+    'Customer Service Complaint': '😠',
+    'Positive Feedback': '🌟',
+    'Sales Opportunity': '💼',
+    'Feature Request': '💡',
+    'Network Coverage': '📡',
+    'Corporate/PR Issue': '🏢',
+  };
+  return iconMap[category] || '📝';
+}
+
+export function getPlatformIcon(platform: string): string {
+  const iconMap: Record<string, string> = {
+    Twitter: '𝕏',
+    Reddit: '🤖',
+    Facebook: '👥',
+  };
+  return iconMap[platform] || '📱';
+}
+
+export function formatSocialTimestamp(timestamp: string): string {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins}m ago`;
+  if (diffHours < 24) return `${diffHours}h ago`;
+  if (diffDays < 7) return `${diffDays}d ago`;
+  
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
+  });
+}
+
+export function getPriorityColor(priority: 'urgent' | 'high' | 'medium' | 'low'): string {
+  const colorMap = {
+    urgent: 'text-red-700 bg-red-100 border-red-300',
+    high: 'text-orange-700 bg-orange-100 border-orange-300',
+    medium: 'text-yellow-700 bg-yellow-100 border-yellow-300',
+    low: 'text-gray-700 bg-gray-100 border-gray-300',
+  };
+  return colorMap[priority];
+}
+
+export function getDepartmentColor(department: 'Sales' | 'Support' | 'PR' | 'Tech'): string {
+  const colorMap = {
+    Sales: 'text-green-700 bg-green-50 border-green-200',
+    Support: 'text-blue-700 bg-blue-50 border-blue-200',
+    PR: 'text-purple-700 bg-purple-50 border-purple-200',
+    Tech: 'text-indigo-700 bg-indigo-50 border-indigo-200',
+  };
+  return colorMap[department];
+}

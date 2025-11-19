@@ -91,3 +91,122 @@ export interface HeatmapPoint {
   lng: number;
   intensity: number;
 }
+
+// Social Media types
+export interface SocialMediaPost {
+  id: number;
+  username: string;
+  social_media: string;
+  comment: string;
+  location: string;
+  timestamp: string;
+  category: string;
+}
+
+export interface SocialMediaDataResponse {
+  data: SocialMediaPost[];
+  total: number;
+  page: number;
+  pageSize: number;
+  timestamp: string;
+}
+
+export interface SentimentDataPoint {
+  date: string;
+  positive: number;
+  negative: number;
+  neutral: number;
+  total: number;
+}
+
+export interface CategoryCount {
+  category: string;
+  count: number;
+  percentage: number;
+}
+
+export interface LocationSentiment {
+  location: string;
+  positive: number;
+  negative: number;
+  neutral: number;
+  total: number;
+}
+
+export interface PlatformCount {
+  platform: string;
+  count: number;
+  percentage: number;
+}
+
+export interface SentimentDataResponse {
+  timeSeriesData: SentimentDataPoint[];
+  categoryBreakdown: CategoryCount[];
+  locationSentiment: LocationSentiment[];
+  platformDistribution: PlatformCount[];
+  overallStats: {
+    totalPosts: number;
+    positivePercentage: number;
+    negativePercentage: number;
+    neutralPercentage: number;
+  };
+  timeRangeHours: number;
+}
+
+export interface ActionItem {
+  id: string;
+  title: string;
+  description: string;
+  priority: 'urgent' | 'high' | 'medium' | 'low';
+  department: 'Sales' | 'Support' | 'PR' | 'Tech';
+  relatedPostIds: number[];
+  relatedPosts?: SocialMediaPost[];
+  status?: 'pending' | 'done' | 'dismissed';
+}
+
+export interface ActionItemsResponse {
+  actionItems: ActionItem[];
+  generatedAt: string;
+  postsAnalyzed: number;
+}
+
+export interface ChatMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+export interface SocialChatRequest {
+  messages: ChatMessage[];
+  filters?: {
+    platform?: string;
+    category?: string;
+    location?: string;
+    hours?: number;
+  };
+}
+
+export interface SocialChatResponse {
+  reply: string;
+  contextUsed: {
+    postCount: number;
+    timeRangeHours: number;
+  };
+}
+
+export interface ResponseDraft {
+  postId: number;
+  originalComment: string;
+  draftResponse: string;
+  tone: string;
+}
+
+export interface ResponseGeneratorRequest {
+  postIds: number[];
+  tone?: 'professional' | 'empathetic' | 'promotional';
+  template?: string;
+}
+
+export interface ResponseGeneratorResponse {
+  responses: ResponseDraft[];
+  generatedAt: string;
+}
