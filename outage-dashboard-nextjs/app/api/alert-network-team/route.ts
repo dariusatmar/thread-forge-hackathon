@@ -5,6 +5,7 @@ interface AlertRequest {
   zip: string;
   hours?: number;
   action: 'generate' | 'submit';
+  existingSummary?: string; // Pre-generated summary from OutageDetailsPane
   incidentData?: {
     zip_code: string;
     outage_start_time: string;
@@ -17,7 +18,7 @@ interface AlertRequest {
 export async function POST(request: NextRequest) {
   try {
     const body: AlertRequest = await request.json();
-    const { zip, hours = 24, action, incidentData } = body;
+    const { zip, hours = 24, action, incidentData, existingSummary } = body;
 
     if (!zip || !action) {
       return NextResponse.json(
@@ -66,19 +67,10 @@ export async function POST(request: NextRequest) {
 
     // Handle GENERATE action - create incident summary
     if (action === 'generate') {
-      const apiKey = process.env.ANTHROPIC_API_KEY;
-      if (!apiKey) {
-        console.error('ANTHROPIC_API_KEY not configured');
-        return NextResponse.json(
-          { error: 'AI service not configured' },
-          { status: 500 }
-        );
-      }
-
       // Calculate time filter
       const timeFilter = new Date(Date.now() - hours * 60 * 60 * 1000);
 
-      console.log(`Generating incident summary for ZIP ${zip}, time filter: ${timeFilter.toISOString()}`);
+      console.log(`Generating incident data for ZIP ${zip}, time filter: ${timeFilter.toISOString()}`);
 
       // Fetch transcripts for this outage
       const query = `
@@ -107,7 +99,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      console.log(`Found ${results.length} transcripts for incident summary`);
+      console.log(`Found ${results.length} transcripts for incident data`);
 
       // Calculate outage start and end times
       const startTimes = results.map(r => new Date(r.startdatetime).getTime());
@@ -119,19 +111,37 @@ export async function POST(request: NextRequest) {
       const uniqueCustomers = new Set(results.map(r => r.customer_id));
       const affectedCustomersCount = uniqueCustomers.size;
 
-      // Build context for AI summary (truncate transcripts to avoid token limits)
-      const MAX_TRANSCRIPT_LENGTH = 1500;
-      const transcriptSummaries = results.map((row, idx) => {
-        const transcript = row.transcript.length > MAX_TRANSCRIPT_LENGTH
-          ? row.transcript.substring(0, MAX_TRANSCRIPT_LENGTH) + '...[truncated]'
-          : row.transcript;
-        
-        const startTime = new Date(row.startdatetime);
-        return `Call ${idx + 1} (Time: ${startTime.toLocaleString()}, Location: ${row.customer_location}):\n${transcript}`;
-      }).join('\n\n---\n\n');
+      let incidentSummary: string;
 
-      // Build system prompt for incident summary
-      const systemPrompt = `You are an AI assistant analyzing technical support call transcripts to generate a concise incident summary for network operations.
+      // Use existing summary if provided, otherwise generate a new one
+      if (existingSummary) {
+        console.log('Using pre-generated summary from OutageDetailsPane');
+        incidentSummary = existingSummary;
+      } else {
+        console.log('No existing summary provided, generating new one...');
+        
+        const apiKey = process.env.ANTHROPIC_API_KEY;
+        if (!apiKey) {
+          console.error('ANTHROPIC_API_KEY not configured');
+          return NextResponse.json(
+            { error: 'AI service not configured' },
+            { status: 500 }
+          );
+        }
+
+        // Build context for AI summary (truncate transcripts to avoid token limits)
+        const MAX_TRANSCRIPT_LENGTH = 1500;
+        const transcriptSummaries = results.map((row, idx) => {
+          const transcript = row.transcript.length > MAX_TRANSCRIPT_LENGTH
+            ? row.transcript.substring(0, MAX_TRANSCRIPT_LENGTH) + '...[truncated]'
+            : row.transcript;
+          
+          const startTime = new Date(row.startdatetime);
+          return `Call ${idx + 1} (Time: ${startTime.toLocaleString()}, Location: ${row.customer_location}):\n${transcript}`;
+        }).join('\n\n---\n\n');
+
+        // Build system prompt for incident summary
+        const systemPrompt = `You are an AI assistant analyzing technical support call transcripts to generate a concise incident summary for network operations.
 
 You have ${results.length} call transcript(s) from ZIP code ${zip} spanning from ${outageStartTime.toLocaleString()} to ${outageEndTime.toLocaleString()}.
 
@@ -147,37 +157,38 @@ Call transcripts:
 
 ${transcriptSummaries}`;
 
-      // Call Anthropic API for summary generation
-      console.log('Calling Anthropic API to generate incident summary...');
-      const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01',
-        },
-        body: JSON.stringify({
-          model: 'claude-haiku-4-5-20251001',
-          max_tokens: 512,
-          system: systemPrompt,
-          messages: [{
-            role: 'user',
-            content: 'Generate the incident summary based on the call transcripts provided.',
-          }],
-        }),
-      });
+        // Call Anthropic API for summary generation
+        console.log('Calling Anthropic API to generate incident summary...');
+        const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': apiKey,
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: 'claude-haiku-4-5-20251001',
+            max_tokens: 512,
+            system: systemPrompt,
+            messages: [{
+              role: 'user',
+              content: 'Generate the incident summary based on the call transcripts provided.',
+            }],
+          }),
+        });
 
-      if (!anthropicResponse.ok) {
-        const errorText = await anthropicResponse.text();
-        console.error('Anthropic API error:', errorText);
-        return NextResponse.json(
-          { error: 'AI service error', details: errorText },
-          { status: anthropicResponse.status }
-        );
+        if (!anthropicResponse.ok) {
+          const errorText = await anthropicResponse.text();
+          console.error('Anthropic API error:', errorText);
+          return NextResponse.json(
+            { error: 'AI service error', details: errorText },
+            { status: anthropicResponse.status }
+          );
+        }
+
+        const anthropicData = await anthropicResponse.json();
+        incidentSummary = anthropicData.content[0].text;
       }
-
-      const anthropicData = await anthropicResponse.json();
-      const incidentSummary = anthropicData.content[0].text;
 
       return NextResponse.json({
         success: true,

@@ -68,6 +68,9 @@ export function OutageDetailsPane({
   const [incidentData, setIncidentData] = useState<IncidentData | null>(null);
   const [isGeneratingSummary, setIsGeneratingSummary] = useState(false);
   const [isSubmittingIncident, setIsSubmittingIncident] = useState(false);
+  const [chatHeight, setChatHeight] = useState(350);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isGeneratingInitialSummary, setIsGeneratingInitialSummary] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch transcripts when outage changes
@@ -100,17 +103,90 @@ export function OutageDetailsPane({
       }
     };
 
-    fetchTranscripts();
-    // Reset chat when outage changes
+    const generateInitialSummary = async () => {
+      setIsGeneratingInitialSummary(true);
+      try {
+        const response = await fetch('/api/outage-summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            zip: selectedOutage.zip_code,
+            hours: selectedHours,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate initial summary');
+        }
+
+        const data = await response.json();
+        const summaryMessage: Message = {
+          role: 'assistant',
+          content: `**Outage Summary**\n\n${data.summary}\n\n---\n\n*Based on ${data.metadata.call_count} calls from ${data.metadata.affected_customers} affected customers*\n\nFeel free to ask me any questions about this outage!`,
+        };
+        setMessages([summaryMessage]);
+      } catch (error) {
+        console.error('Error generating initial summary:', error);
+        // Don't show error message to user, just leave chat empty
+      } finally {
+        setIsGeneratingInitialSummary(false);
+      }
+    };
+
+    // Reset state when outage changes
     setMessages([]);
     setExpandedCallIds(new Set());
     setCityName('');
+
+    // Fetch transcripts and generate initial summary
+    fetchTranscripts();
+    generateInitialSummary();
   }, [selectedOutage, selectedHours]);
 
   // Auto-scroll chat to bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Handle resizing
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging) return;
+
+      // Calculate from window bottom
+      const newHeight = window.innerHeight - e.clientY;
+      
+      // Set min and max constraints (200px min, window height - 200px max to leave room for header)
+      const minHeight = 200;
+      const maxHeight = window.innerHeight - 200;
+      
+      const constrainedHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+      setChatHeight(constrainedHeight);
+    };
+
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'row-resize';
+      document.body.style.userSelect = 'none';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isDragging]);
+
+  const handleDragStart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
 
   const toggleCallExpanded = (callId: number) => {
     setExpandedCallIds((prev) => {
@@ -165,6 +241,33 @@ export function OutageDetailsPane({
   const handleAlertNetworkTeam = async () => {
     if (!selectedOutage || isGeneratingSummary) return;
 
+    // Extract the existing summary from messages (first assistant message)
+    const existingSummary = messages.find(msg => msg.role === 'assistant')?.content;
+    
+    // Remove markdown formatting and metadata from the summary
+    let cleanedSummary = '';
+    if (existingSummary) {
+      // Extract just the summary text, removing the header and footer
+      const lines = existingSummary.split('\n');
+      const summaryLines = [];
+      let inSummary = false;
+      
+      for (const line of lines) {
+        if (line.includes('**Outage Summary**')) {
+          inSummary = true;
+          continue;
+        }
+        if (line.includes('---') || line.includes('*Based on')) {
+          break;
+        }
+        if (inSummary && line.trim()) {
+          summaryLines.push(line.trim());
+        }
+      }
+      
+      cleanedSummary = summaryLines.join(' ').trim();
+    }
+
     setIsGeneratingSummary(true);
     try {
       const response = await fetch('/api/alert-network-team', {
@@ -174,6 +277,7 @@ export function OutageDetailsPane({
           zip: selectedOutage.zip_code,
           hours: selectedHours,
           action: 'generate',
+          existingSummary: cleanedSummary || undefined, // Pass cleaned summary if available
         }),
       });
 
@@ -331,8 +435,19 @@ export function OutageDetailsPane({
           )}
         </div>
 
+        {/* Draggable Divider */}
+        <div
+          onMouseDown={handleDragStart}
+          className={`h-2 bg-gray-200 border-y border-gray-300 cursor-row-resize hover:bg-gray-300 transition-colors flex items-center justify-center ${
+            isDragging ? 'bg-gray-400' : ''
+          }`}
+          style={{ touchAction: 'none' }}
+        >
+          <div className="w-12 h-1 bg-gray-400 rounded-full" />
+        </div>
+
         {/* Chat Section */}
-        <div className="border-t-2 border-black bg-white flex flex-col" style={{ height: '350px' }}>
+        <div className="border-t-2 border-black bg-white flex flex-col" style={{ height: `${chatHeight}px` }}>
           <div className="p-3 border-b border-gray-200">
             <h3 className="font-bold text-sm">Manage Outage Response</h3>
             <p className="text-xs text-gray-500 mt-1">
@@ -342,9 +457,16 @@ export function OutageDetailsPane({
 
           {/* Chat Messages */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3">
-            {messages.length === 0 ? (
+            {messages.length === 0 && !isGeneratingInitialSummary ? (
               <div className="text-center text-gray-400 text-xs py-4">
                 Start a conversation by asking a question below
+              </div>
+            ) : isGeneratingInitialSummary && messages.length === 0 ? (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 text-black border border-gray-300 rounded p-3 flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span className="text-xs">Generating outage summary...</span>
+                </div>
               </div>
             ) : (
               messages.map((msg, idx) => (
@@ -407,7 +529,8 @@ export function OutageDetailsPane({
             <button
               onClick={handleAlertNetworkTeam}
               disabled={isGeneratingSummary || isLoadingTranscripts}
-              className="w-full py-3 mb-3 bg-red-600 text-white font-bold rounded hover:bg-red-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="px-6 py-2 mb-3 bg-green-500 text-black font-bold border-2 border-black hover:bg-green-400 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
+              style={{ backgroundColor: isGeneratingSummary || isLoadingTranscripts ? undefined : '#008822' }}
             >
               {isGeneratingSummary ? (
                 <>
