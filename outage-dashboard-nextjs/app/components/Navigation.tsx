@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Activity, MessageSquare } from 'lucide-react';
+import { Activity, MessageSquare, Users } from 'lucide-react';
 
 export function Navigation() {
   const pathname = usePathname();
@@ -20,6 +20,12 @@ export function Navigation() {
       href: '/social-media',
       icon: MessageSquare,
       active: pathname === '/social-media',
+    },
+    {
+      name: 'Customer Intelligence',
+      href: '/customer-intelligence',
+      icon: Users,
+      active: pathname === '/customer-intelligence',
     },
   ];
 

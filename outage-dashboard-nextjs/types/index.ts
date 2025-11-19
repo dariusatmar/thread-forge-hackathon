@@ -26,7 +26,7 @@ export interface Customer {
   location: string; // ZIP code
   created_at: Date;
   updated_at: Date;
-  contact_phone: string;
+  contact_phone: string | null;
   multi_site: boolean;
   subscription_tier: string;
   industry: string;
@@ -209,4 +209,96 @@ export interface ResponseGeneratorRequest {
 export interface ResponseGeneratorResponse {
   responses: ResponseDraft[];
   generatedAt: string;
+}
+
+// Churn Analysis types
+export interface ChurnSignal {
+  type: 'transcript_keyword' | 'repeat_issue' | 'social_negative' | 'sentiment_decline' | 'call_frequency';
+  severity: 'low' | 'medium' | 'high';
+  evidence: string;
+  timestamp?: string;
+  callId?: number;
+  posts?: SocialMediaPost[];
+}
+
+export interface RetentionStrategy {
+  rootCause: string;
+  recommendedActions: string[];
+  talkingPoints: string[];
+  estimatedCost: number;
+  customerLifetimeValue: number;
+  successProbability: number;
+}
+
+export interface ChurnAnalysis {
+  customer: {
+    customerId: string;
+    name: string;
+    location: string;
+    accountValue: number;
+    servicePlan?: string;
+    accountStatus?: string;
+  };
+  riskScore: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  churnSignals: ChurnSignal[];
+  sentimentJourney: Array<{
+    date: string;
+    score: number;
+    sentiment: 'positive' | 'neutral' | 'negative' | 'very_negative';
+  }>;
+  retentionStrategy?: RetentionStrategy;
+  callHistory: {
+    totalCalls: number;
+    technicalCalls: number;
+    billingCalls: number;
+    recentCallDates: string[];
+  };
+}
+
+export interface AtRiskCustomer {
+  customerId: string;
+  name: string;
+  riskScore: number;
+  riskLevel: 'low' | 'medium' | 'high';
+  primaryIssue: string;
+  accountValue: number;
+  lastActivity: string;
+  location: string;
+}
+
+export interface ChurnBatchAnalysisResponse {
+  summary: {
+    totalCustomers: number;
+    analyzed: number;
+    highRisk: number;
+    mediumRisk: number;
+    lowRisk: number;
+    totalRevAtRisk: number;
+  };
+  atRiskCustomers: AtRiskCustomer[];
+  generatedAt: string;
+}
+
+export interface ChurnInsightsResponse {
+  topChurnReasons: Array<{
+    reason: string;
+    count: number;
+    percentage: number;
+  }>;
+  geographicPatterns: Array<{
+    location: string;
+    highRiskCount: number;
+    mediumRiskCount: number;
+    avgRiskScore: number;
+  }>;
+  trends: {
+    weekOverWeek: {
+      change: string;
+      direction: 'increasing' | 'decreasing' | 'stable';
+    };
+    prediction: string;
+  };
+  recommendations: string[];
+  timeRangeHours: number;
 }
