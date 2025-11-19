@@ -244,7 +244,7 @@ export function OutageDetailsPane({
     // Extract the existing summary from messages (first assistant message)
     const existingSummary = messages.find(msg => msg.role === 'assistant')?.content;
     
-    // Remove markdown formatting and metadata from the summary
+    // Remove header and footer metadata from the summary while preserving markdown
     let cleanedSummary = '';
     if (existingSummary) {
       // Extract just the summary text, removing the header and footer
@@ -260,12 +260,13 @@ export function OutageDetailsPane({
         if (line.includes('---') || line.includes('*Based on')) {
           break;
         }
-        if (inSummary && line.trim()) {
-          summaryLines.push(line.trim());
+        if (inSummary) {
+          summaryLines.push(line);
         }
       }
       
-      cleanedSummary = summaryLines.join(' ').trim();
+      // Preserve markdown formatting by keeping line breaks
+      cleanedSummary = summaryLines.join('\n').trim();
     }
 
     setIsGeneratingSummary(true);
@@ -618,8 +619,35 @@ export function OutageDetailsPane({
 
                 <div className="border border-gray-300 rounded p-4 bg-gray-50">
                   <p className="text-sm font-semibold text-gray-700 mb-2">Incident Summary</p>
-                  <div className="text-sm text-gray-800 whitespace-pre-wrap">
-                    {incidentData.incident_summary}
+                  <div className="text-sm text-gray-800">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                        ul: ({ children }) => <ul className="list-disc list-inside mb-2 space-y-1">{children}</ul>,
+                        ol: ({ children }) => <ol className="list-decimal list-inside mb-2 space-y-1">{children}</ol>,
+                        li: ({ children }) => <li className="ml-2">{children}</li>,
+                        strong: ({ children }) => <strong className="font-bold">{children}</strong>,
+                        em: ({ children }) => <em className="italic">{children}</em>,
+                        code: ({ className, children, ...props }) => {
+                          const isInline = !className;
+                          return isInline ? (
+                            <code className="bg-gray-200 px-1 py-0.5 rounded text-xs font-mono" {...props}>
+                              {children}
+                            </code>
+                          ) : (
+                            <code className="block bg-gray-200 p-2 rounded text-xs font-mono overflow-x-auto my-2" {...props}>
+                              {children}
+                            </code>
+                          );
+                        },
+                        h1: ({ children }) => <h1 className="text-base font-bold mb-2">{children}</h1>,
+                        h2: ({ children }) => <h2 className="text-sm font-bold mb-2">{children}</h2>,
+                        h3: ({ children }) => <h3 className="text-xs font-bold mb-1">{children}</h3>,
+                      }}
+                    >
+                      {incidentData.incident_summary}
+                    </ReactMarkdown>
                   </div>
                 </div>
               </div>
